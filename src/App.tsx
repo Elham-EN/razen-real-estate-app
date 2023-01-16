@@ -6,11 +6,14 @@ import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/Profile";
 import Offers from "./pages/Offers";
+// Import Components
+import Header from "./components/Header";
 
-function App() {
+function App(): JSX.Element {
   return (
     <>
       <Router>
+        <Header />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
