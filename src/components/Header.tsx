@@ -16,7 +16,7 @@ export default function Header(): JSX.Element {
   const pathMatchStyle = "text-black border-b-red-500";
 
   return (
-    <div className="bg-white border-b shadow-lg sticky top-0 z-50 px-2">
+    <div className="bg-white border-b shadow-lg sticky top-0 z-50 px-3">
       <header className="flex justify-between items-center px-1 max-w-6xl mx-auto ">
         <div>
           <Link to={"/"}>
