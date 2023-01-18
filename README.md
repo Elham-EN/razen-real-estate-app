@@ -30,6 +30,7 @@ npm run dev
 - Tailwind CSS
 - React Router v6
 - Google Firebase v9
+- Vite (Frontend Tooling)
 
 ### Custom Hook Functions:
 
