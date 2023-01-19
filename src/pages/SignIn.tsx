@@ -9,7 +9,7 @@ import KeyImage from "../assets/key.jpg";
 export default function SignIn(): JSX.Element {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, handleChange] = useForm();
-  const { signIn } = useAuth();
+  const { signIn, isPending } = useAuth();
 
   const handleSignInSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -84,12 +84,22 @@ export default function SignIn(): JSX.Element {
                 </Link>
               </p>
             </div>
-            <button
-              className="bg-blue-600 w-full text-white py-3 rounded transition duration-300 ease-in-out hover:bg-blue-800 font-medium uppercase shadow-md hover:shadow-lg active:bg-blue-800"
-              type="submit"
-            >
-              Sign in
-            </button>
+            {!isPending && (
+              <button
+                className="bg-blue-600 w-full text-white py-3 rounded transition duration-300 ease-in-out hover:bg-blue-800 font-medium uppercase shadow-md hover:shadow-lg active:bg-blue-800"
+                type="submit"
+              >
+                Sign in
+              </button>
+            )}
+            {isPending && (
+              <button
+                className="bg-blue-600 w-full text-white py-3 rounded transition duration-300 ease-in-out hover:bg-blue-800 font-medium uppercase shadow-md hover:shadow-lg active:bg-blue-800"
+                type="submit"
+              >
+                Loading
+              </button>
+            )}
             <div className="flex items-center before:border-t before:flex-1 before:border-gray-300 after:border-t after:flex-1 after:border-gray-300">
               <p className="text-center font-semibold mx-4">OR</p>
             </div>

@@ -1,10 +1,19 @@
+import { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import useForm from "../hooks/useForm";
-import OAuthBtn from "../components/OAuthBtn";
+import useAuth from "../hooks/useAuth";
 import KeyImage from "../assets/housekey2.jpg";
 
 export default function ForgotPassword(): JSX.Element {
   const [formData, handleChange] = useForm();
+  const { forgotPassword } = useAuth();
+
+  const handleResetPasswordSubmit = async (
+    event: FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+    forgotPassword(formData.email);
+  };
 
   return (
     <section>
@@ -16,7 +25,10 @@ export default function ForgotPassword(): JSX.Element {
           <img className="w-full rounded-2xl" src={KeyImage} alt="key" />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form className="flex flex-col gap-5">
+          <form
+            onSubmit={handleResetPasswordSubmit}
+            className="flex flex-col gap-5"
+          >
             <div>
               <input
                 className="w-full px-4 py-2 text-xl placeholder-gray-400 border-gray-300 rounded transition ease-in-out"

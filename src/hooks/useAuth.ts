@@ -6,6 +6,7 @@ import {
   AuthError,
   GoogleAuthProvider,
   signInWithPopup,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { useNavigate } from "react-router";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
@@ -100,5 +101,15 @@ export default function useAuth() {
     }
   };
 
-  return { signUp, signIn, googleAuth, isPending };
+  const forgotPassword = async (email: string) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast.success("Email was sent");
+    } catch (err) {
+      const authError = err as AuthError;
+      toast.error(authError.message);
+    }
+  };
+
+  return { signUp, signIn, googleAuth, forgotPassword, isPending };
 }
