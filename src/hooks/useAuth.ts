@@ -78,10 +78,25 @@ export default function useAuth() {
   };
 
   const signIn = async (email: string, password: string) => {
+    setIsPending(true);
     try {
-      const res = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      if (userCredential.user) {
+        toast.success("signed in successfully");
+        setTimeout(() => {
+          setIsPending(false);
+          navigateTo("/");
+        }, 5000);
+      } else {
+        toast.error("Invalid credentials");
+      }
     } catch (err) {
       const authError = err as AuthError;
+      toast.error(authError.message);
     }
   };
 

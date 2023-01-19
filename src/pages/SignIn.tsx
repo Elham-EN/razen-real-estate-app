@@ -1,13 +1,23 @@
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { Link } from "react-router-dom";
 import useForm from "../hooks/useForm";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import OAuthBtn from "../components/OAuthBtn";
+import useAuth from "../hooks/useAuth";
 import KeyImage from "../assets/key.jpg";
 
 export default function SignIn(): JSX.Element {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, handleChange] = useForm();
+  const { signIn } = useAuth();
+
+  const handleSignInSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const { email, password } = formData;
+    await signIn(email, password);
+    formData.email = "";
+    formData.password = "";
+  };
 
   return (
     <section>
@@ -19,7 +29,7 @@ export default function SignIn(): JSX.Element {
           <img className="w-full rounded-2xl" src={KeyImage} alt="key" />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form className="flex flex-col gap-5">
+          <form onSubmit={handleSignInSubmit} className="flex flex-col gap-5">
             <div>
               <input
                 className="w-full px-4 py-2 text-xl placeholder-gray-400 border-gray-300 rounded transition ease-in-out"
