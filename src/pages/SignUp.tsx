@@ -1,13 +1,26 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import useForm from "../hooks/useForm";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import OAuthBtn from "../components/OAuthBtn";
+import useAuth from "../hooks/useAuth";
 import KeyImage from "../assets/housekey.jpg";
 
 export default function SignUp(): JSX.Element {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, handleChange] = useForm();
+  const { error, isPending, signUp } = useAuth();
+  const navigateTo = useNavigate();
+
+  const handleSignUpSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const { fullname, email, password } = formData;
+    await signUp(email, password, fullname);
+    formData.email = "";
+    formData.password = "";
+    formData.fullname = "";
+    navigateTo("/");
+  };
 
   return (
     <section>
@@ -19,7 +32,7 @@ export default function SignUp(): JSX.Element {
           <img className="w-full rounded-2xl" src={KeyImage} alt="key" />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form className="flex flex-col gap-5">
+          <form onSubmit={handleSignUpSubmit} className="flex flex-col gap-5">
             <div>
               <input
                 className="w-full px-4 py-2 text-xl placeholder-gray-400 border-gray-300 rounded transition ease-in-out"
@@ -78,12 +91,27 @@ export default function SignUp(): JSX.Element {
                 </Link>
               </p>
             </div>
-            <button
-              className="bg-blue-600 w-full text-white py-3 rounded transition duration-300 ease-in-out hover:bg-blue-800 font-medium uppercase shadow-md hover:shadow-lg active:bg-blue-800"
-              type="submit"
-            >
-              Sign Up
-            </button>
+            {!isPending && (
+              <button
+                className="bg-blue-600 w-full text-white py-3 rounded transition duration-300 ease-in-out hover:bg-blue-800 font-medium uppercase shadow-md hover:shadow-lg active:bg-blue-800"
+                type="submit"
+              >
+                Sign Up
+              </button>
+            )}
+            {isPending && (
+              <button
+                className="bg-blue-600 w-full text-white py-3 rounded transition duration-300 ease-in-out hover:bg-blue-800 font-medium uppercase shadow-md hover:shadow-lg active:bg-blue-800"
+                type="submit"
+              >
+                loading...
+              </button>
+            )}
+            {error && (
+              <div className="bg-red-600 py-3 text-white font-semibold text-center rounded">
+                {error}
+              </div>
+            )}
             <div className="flex items-center before:border-t before:flex-1 before:border-gray-300 after:border-t after:flex-1 after:border-gray-300">
               <p className="text-center font-semibold mx-4">OR</p>
             </div>
