@@ -8,6 +8,7 @@ import Profile from "./pages/Profile";
 import Offers from "./pages/Offers";
 // Import Components
 import Header from "./components/Header";
+import Toast from "./components/Toast";
 
 function App(): JSX.Element {
   return (
@@ -23,6 +24,7 @@ function App(): JSX.Element {
           <Route path="/offers" element={<Offers />} />
         </Routes>
       </Router>
+      <Toast />
     </>
   );
 }

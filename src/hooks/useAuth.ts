@@ -6,16 +6,18 @@ import {
   User,
   AuthError,
 } from "firebase/auth";
+import { useNavigate } from "react-router";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, firestoreDB } from "../firebase.config";
+import { toast } from "react-toastify";
 
 export default function useAuth() {
   //   const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // const [errorExist, setErrorExist] = useState<boolean>(false);
   const [isPending, setIsPending] = useState<boolean>(false);
+  const navigateTo = useNavigate();
 
   const signUp = async (email: string, password: string, fullname: string) => {
-    setError(null);
     setIsPending(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -34,11 +36,12 @@ export default function useAuth() {
         email: userCredential.user.email,
         timestamp,
       });
-
+      toast.success("User sign up successfully");
+      navigateTo("/");
       setIsPending(false);
     } catch (err) {
       const authError = err as AuthError;
-      setError(authError.message);
+      toast.error(authError.message);
       setIsPending(false);
     }
   };
@@ -48,9 +51,8 @@ export default function useAuth() {
       const res = await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
       const authError = err as AuthError;
-      setError(authError.message);
     }
   };
 
-  return { signUp, signIn, error, isPending };
+  return { signUp, signIn, isPending };
 }

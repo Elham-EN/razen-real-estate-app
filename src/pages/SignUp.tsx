@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import useForm from "../hooks/useForm";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import OAuthBtn from "../components/OAuthBtn";
@@ -9,8 +9,7 @@ import KeyImage from "../assets/housekey.jpg";
 export default function SignUp(): JSX.Element {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, handleChange] = useForm();
-  const { error, isPending, signUp } = useAuth();
-  const navigateTo = useNavigate();
+  const { isPending, signUp } = useAuth();
 
   const handleSignUpSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -19,7 +18,6 @@ export default function SignUp(): JSX.Element {
     formData.email = "";
     formData.password = "";
     formData.fullname = "";
-    navigateTo("/");
   };
 
   return (
@@ -106,11 +104,6 @@ export default function SignUp(): JSX.Element {
               >
                 loading...
               </button>
-            )}
-            {error && (
-              <div className="bg-red-600 py-3 text-white font-semibold text-center rounded">
-                {error}
-              </div>
             )}
             <div className="flex items-center before:border-t before:flex-1 before:border-gray-300 after:border-t after:flex-1 after:border-gray-300">
               <p className="text-center font-semibold mx-4">OR</p>
