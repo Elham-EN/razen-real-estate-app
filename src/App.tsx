@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Outlet,
+} from "react-router-dom";
 // Import pages component
 import Home from "./pages/Home";
 import SignIn from "./pages/SignIn";
@@ -9,6 +14,7 @@ import Offers from "./pages/Offers";
 // Import Components
 import Header from "./components/Header";
 import Toast from "./components/Toast";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App(): JSX.Element {
   return (
@@ -17,7 +23,9 @@ function App(): JSX.Element {
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<PrivateRoute />}>
+            <Route path="/profile" element={<Profile />} />
+          </Route>
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

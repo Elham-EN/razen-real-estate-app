@@ -7,6 +7,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
+  signOut,
 } from "firebase/auth";
 import { useNavigate } from "react-router";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
@@ -48,7 +49,7 @@ export default function useAuth() {
     }
   };
 
-  const googleAuth = async () => {
+  const googleAuth = async (): Promise<void> => {
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
@@ -98,10 +99,11 @@ export default function useAuth() {
     } catch (err) {
       const authError = err as AuthError;
       toast.error(authError.message);
+      setIsPending(false);
     }
   };
 
-  const forgotPassword = async (email: string) => {
+  const forgotPassword = async (email: string): Promise<void> => {
     try {
       await sendPasswordResetEmail(auth, email);
       toast.success("Email was sent");
@@ -111,5 +113,15 @@ export default function useAuth() {
     }
   };
 
-  return { signUp, signIn, googleAuth, forgotPassword, isPending };
+  const signOutUser = async (): Promise<void> => {
+    try {
+      await signOut(auth);
+      navigateTo("/sign-in");
+    } catch (err) {
+      const authError = err as AuthError;
+      toast.error(authError.message);
+    }
+  };
+
+  return { signUp, signIn, googleAuth, forgotPassword, signOutUser, isPending };
 }
