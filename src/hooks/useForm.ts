@@ -24,11 +24,33 @@ export default function useForm(): [
 ] {
   const [formData, setFormData] = useState<FormData>(initialFormData);
 
-  const handleChange = (key: keyof FormData, value: string) => {
-    //Spreading the existing props of formData into new object, add new key
-    //value pair or update the existing key value pair in the formData object
-    setFormData({ ...formData, [key]: value });
+  //In this case, it creates a copy of the previous form data object, updates
+  //the value of the specified field, and returns the updated form data object.
+  //This ensures that the state is updated in an immutable way, avoiding any
+  //side effects.
+  const handleChange = (field: keyof FormData, value: string) => {
+    setFormData((prevFormData) => {
+      // create a copy of the previous form data
+      const newFormData = { ...prevFormData };
+      // update the value of the field
+      newFormData[field] = value;
+      // return the updated form data
+      return newFormData;
+    });
   };
 
   return [formData, handleChange];
 }
+
+/**
+ * When I say that the state is updated in an immutable way, I mean
+ * that the state is not modified directly, but rather a new copy of
+ * the state is created with the necessary changes. This approach
+ * ensures that the previous state remains unchanged, which can help
+ * prevent unexpected side effects in your code.
+ *
+ * By using an immutable approach, when you update the state, you
+ * create a new copy of the state with the changes, rather than directly
+ * modifying the original state. This approach allows you to maintain
+ * the previous state and avoid any side effects.
+ */
