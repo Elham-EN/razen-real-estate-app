@@ -28,18 +28,18 @@ export default function Profile(): JSX.Element {
     await signOutUser();
   };
 
-  //Update user fullname
+  // Update user fullname
   const onSubmit = async () => {
     try {
       if (
         auth.currentUser?.displayName !== formData.fullname &&
         auth.currentUser
       ) {
-        //Udpate display name in firebase auth
+        // Udpate display name in firebase auth
         await updateProfile(auth.currentUser, {
           displayName: formData.fullname,
         });
-        //Update fullname in the firestore
+        // Update fullname in the firestore
         const docRef = doc(firestoreDB, "users", auth.currentUser.uid);
         await updateDoc(docRef, {
           fullname: formData.fullname,

@@ -1,5 +1,8 @@
+import { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import HeaderLogo from "../assets/header-logo-3.png";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase.config";
 
 function pathMatcherRoute(route: string): boolean {
   //Does this route match the current URL location path
@@ -14,6 +17,17 @@ export default function Header(): JSX.Element {
   const linkStyle =
     "py-3 text-sm font-semibold text-gray-400 border-b-[3px] border-b-transparent";
   const pathMatchStyle = "text-black border-b-red-500";
+  const [pageState, setPageState] = useState("Sign in");
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setPageState("Profile");
+      } else {
+        setPageState("Sign in");
+      }
+    });
+  }, [auth]);
 
   return (
     <div className="bg-white border-b shadow-lg sticky top-0 z-50 px-3">
@@ -47,13 +61,15 @@ export default function Header(): JSX.Element {
                 Offers
               </li>
             </Link>
-            <Link className="cursor-pointer" to={"/sign-in"}>
+            <Link className="cursor-pointer" to={"/profile"}>
               <li
                 className={`${linkStyle} ${
-                  pathMatcherRoute("/sign-in") && pathMatchStyle
+                  (pathMatcherRoute("/sign-in") ||
+                    pathMatcherRoute("/profile")) &&
+                  pathMatchStyle
                 }`}
               >
-                Sign in
+                {pageState}
               </li>
             </Link>
           </ul>

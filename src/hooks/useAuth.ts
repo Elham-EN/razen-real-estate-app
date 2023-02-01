@@ -41,7 +41,7 @@ export default function useAuth() {
       setTimeout(() => {
         setIsPending(false);
         navigateTo("/");
-      }, 5000);
+      }, 2000);
     } catch (err) {
       const authError = err as AuthError;
       toast.error(authError.message);
@@ -70,7 +70,7 @@ export default function useAuth() {
         setTimeout(() => {
           setIsPending(false);
           navigateTo("/");
-        }, 5000);
+        }, 2000);
       } else {
         toast.error("User already signed up");
       }
@@ -92,7 +92,7 @@ export default function useAuth() {
         setTimeout(() => {
           setIsPending(false);
           navigateTo("/");
-        }, 5000);
+        }, 2000);
       } else {
         toast.error("Invalid credentials");
       }
