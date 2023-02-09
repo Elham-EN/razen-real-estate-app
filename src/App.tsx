@@ -11,6 +11,7 @@ import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/Profile";
 import Offers from "./pages/Offers";
+import CreateListing from "./pages/CreateListing";
 // Import Components
 import Header from "./components/Header";
 import Toast from "./components/Toast";
@@ -30,6 +31,7 @@ function App(): JSX.Element {
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/offers" element={<Offers />} />
+          <Route path="/create-listing" element={<CreateListing />} />
         </Routes>
       </Router>
       <Toast />
