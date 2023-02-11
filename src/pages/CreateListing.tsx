@@ -2,29 +2,16 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useState, useEffect } from "react";
 import { DropzoneArea } from "material-ui-dropzone";
+import { toast } from "react-toastify";
 import ErrorMessage from "../components/ErrorMessage";
-
-interface FormDataType {
-  type: string;
-  name: string;
-  bedrooms: number;
-  bathrooms: number;
-  parking: boolean;
-  furnished: boolean;
-  address: string;
-  description: string;
-  offer: boolean;
-  regularPrice: number;
-  discountedPrice: number;
-  /**
-   * The type FileList | null is used because when the user selects
-   * images from their computer, the input element will return a FileList
-   * object representing the selected files. However, if the user doesn't
-   * select any files or cancels the file selection, the value of the input
-   * element will be null
-   */
-  images: FileList | null;
-}
+import Spinner from "../components/Spinner";
+import useCloudService from "../hooks/useCloudService";
+import {
+  FormDataType,
+  GeolocationType,
+  saveFormDataToDB,
+} from "../types/CreateListingFormData";
+import { useNavigate } from "react-router";
 
 const FormData: FormDataType = {
   type: "rent",
@@ -45,28 +32,104 @@ const validationSchema = Yup.object().shape({
   name: Yup.string().required("Name is required").min(10).max(32),
   bedrooms: Yup.number().min(1).max(25).positive(),
   bathrooms: Yup.number().min(1).max(15).positive(),
-  address: Yup.string().required("address is required"),
+  address: Yup.string()
+    .required("address is required")
+    /**
+     Explanation of the regular expression:
+
+      '^': Matches the start of the string.
+      '\d+': Matches one or more digits. This represents the street number.
+      '\s': Matches a white space character.
+      '[a-zA-Z\s]+': Matches one or more characters that are either a letter 
+      (uppercase or lowercase) or a white space. This represents the street 
+      name, the city name, and the state name.
+      ',': Matches a comma.
+      '\s': Matches a white space character.
+      '\d'{4}: Matches exactly 4 digits. This represents the postal code.
+      '$': Matches the end of the string.
+     */
+    .matches(/^\d+\s[a-zA-Z\s]+,[a-zA-Z\s]+,[a-zA-Z\s]+\s\d{4}$/, {
+      message: "must follow this format: 123 Main St, City, State POSTCODE",
+    }),
   description: Yup.string().required("description is required"),
   regularPrice: Yup.number().required().positive().min(50).max(50000000),
   discountedPrice: Yup.number().positive(),
 });
 
 export default function CreateListing() {
+  const navigateTo = useNavigate();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [imageURLs, setImageURLs] = useState<string[]>([]);
+  const { storeImageToBucket, retrieveImageUrls, storeFormDataToDB } =
+    useCloudService();
   const formik = useFormik<FormDataType>({
     initialValues: {
       ...FormData,
     },
     validationSchema,
-    onSubmit: (values) => {
-      console.log("FormData: ", values);
+    onSubmit: async (values, { resetForm }) => {
+      setLoading(true);
+      values.discountedPrice = Number(values.discountedPrice);
+      values.regularPrice = Number(values.regularPrice);
+      if (values.discountedPrice >= values.regularPrice) {
+        setLoading(false);
+        toast.error("Discounted price needs to be less than regular price");
+        return;
+      }
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?
+          q=${values.address}}&format=json&limit=1`
+      );
+      const data = await response.json();
+      if (data[0] === undefined) {
+        toast.error("This address is undefined");
+        setLoading(false);
+        return;
+      }
+      const geolocation: GeolocationType = {
+        lat: 0,
+        lng: 0,
+      };
+      geolocation.lng = Number(data[0].lon);
+      geolocation.lat = Number(data[0].lat);
+
+      if (imageURLs) {
+        const newFormData: saveFormDataToDB = {
+          ...values,
+          geolocation: geolocation,
+          imageURLs: imageURLs,
+        };
+        delete newFormData.images;
+        //if user don't want offer then remove dicountedPrice
+        !newFormData.offer && delete newFormData.discountedPrice;
+        await storeFormDataToDB(newFormData);
+        setLoading(false);
+        toast.success("Listing created");
+        setTimeout(() => {
+          resetForm();
+          navigateTo("/");
+        }, 3000);
+      }
     },
   });
 
   useEffect(() => {
-    console.log("Hello There");
-    console.log(formik.values);
-    console.log(formik.errors);
-  }, [formik.values, formik.errors]);
+    // Store images to cloud storage
+    formik.values.images &&
+      [...formik.values.images].length === 5 &&
+      [...formik.values.images].forEach(async (image) => {
+        console.log("Hello Elham");
+        const storageRef = await storeImageToBucket(image);
+        const imageURL = await retrieveImageUrls(storageRef);
+        if (imageURL) {
+          setImageURLs((prevImgUrls) => [...prevImgUrls, imageURL]);
+        }
+      });
+  }, [formik.values.images]);
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="max-w-md mx-auto px-2 mb-20">
@@ -212,7 +275,7 @@ export default function CreateListing() {
             onChange={(e) => formik.setFieldValue("address", e.target.value)}
             className="w-full  border-gray-200 rounded text-lg text-gray-700 
               shadow-md"
-            placeholder="location"
+            placeholder="e.g. 123 Main St, City, State POSTCODE"
           />
         </div>
         {formik.touched.address && (
@@ -265,7 +328,7 @@ export default function CreateListing() {
             </button>
           </div>
         </div>
-        <div className="mt-10 flex flex-col  items-start gap-10">
+        <div className="mt-10 flex flex-col  items-start gap-3">
           <div className="flex gap-10 items-center">
             <div>
               <p className="text-lg font-semibold">Regular Price</p>
@@ -301,23 +364,25 @@ export default function CreateListing() {
         <div className="mt-6">
           <p className="text-lg font-semibold">Images</p>
           <p className="text-gray-600">
-            The first image will be the cover (max 6)
+            The first image will be the cover (must select 6 images)
           </p>
           <DropzoneArea
-            filesLimit={6}
+            filesLimit={5}
             acceptedFiles={["image/*"]}
             dropzoneText={"Drag and drop an image here or click"}
             onChange={(files) => formik.setFieldValue("images", files)}
           />
         </div>
-        <button
-          type="submit"
-          className="mt-10 bg-blue-600 w-full py-3 uppercase rounded-lg 
+        {formik.values.images && [...formik.values.images].length === 5 && (
+          <button
+            type="submit"
+            className="mt-10 bg-blue-600 w-full py-3 uppercase rounded-lg 
           shadow-md font-semibold transition duration-500 ease-in-out 
           hover:shadow-xl hover:bg-blue-800 focus:shadow-xl text-white"
-        >
-          Create Listing
-        </button>
+          >
+            Create Listing
+          </button>
+        )}
       </form>
     </div>
   );
