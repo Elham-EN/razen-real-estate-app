@@ -11,10 +11,20 @@ import {
   collection,
   serverTimestamp,
   FirestoreError,
+  query,
+  getDocs,
+  where,
+  orderBy,
 } from "firebase/firestore";
-import { saveFormDataToDB } from "../types/CreateListingFormData";
+import {
+  saveFormDataToDB,
+  DataFromDBType,
+} from "../types/CreateListingFormData";
+import { useState } from "react";
 
 export default function useCloudService() {
+  let dataSet = new Set<DataFromDBType>();
+  const [dataArr, setDataArr] = useState(Array());
   const storeImageToBucket = async (image: File) => {
     // A reference can be thought of as a pointer to a file in the cloud
     const filename = `${auth.currentUser?.uid}-${image.name}}`;
@@ -61,5 +71,31 @@ export default function useCloudService() {
     }
   };
 
-  return { storeImageToBucket, retrieveImageUrls, storeFormDataToDB };
+  const retrieveDataFromDB = async () => {
+    try {
+      // Retrieve multiple documents from a collectiom based on
+      // current authenticated user
+      const q = query(
+        collection(firestoreDB, "listings"),
+        where("userRef", "==", auth.currentUser?.uid)
+      );
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        dataSet.add({ listingDocId: doc.id, ...doc.data() });
+      });
+      const dataArrLocal = Array.from(dataSet);
+      return dataArrLocal;
+
+      //setData(data);
+    } catch (error) {
+      const errorMsg = error as FirestoreError;
+      console.log(errorMsg);
+    }
+  };
+  return {
+    storeImageToBucket,
+    retrieveImageUrls,
+    storeFormDataToDB,
+    retrieveDataFromDB,
+  };
 }

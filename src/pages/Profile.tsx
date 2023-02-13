@@ -1,4 +1,4 @@
-import { MouseEvent, ChangeEvent, useEffect, useState } from "react";
+import { MouseEvent, ChangeEvent, useEffect, useState, useRef } from "react";
 import useAuth from "../hooks/useAuth";
 import useForm from "../hooks/useForm";
 import { auth, firestoreDB } from "../firebase.config";
@@ -6,19 +6,35 @@ import { updateProfile, AuthError } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { FcHome } from "react-icons/fc";
+import { Link } from "react-router-dom";
 import ListingItems from "../components/ListingItems";
+import useCloudService from "../hooks/useCloudService";
+import { DataFromDBType } from "../types/CreateListingFormData";
 
 export default function Profile(): JSX.Element {
+  const { retrieveDataFromDB } = useCloudService();
   const [formData, handleChange] = useForm();
   const [changeDetail, setChangeDetail] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [listings, setListings] = useState<DataFromDBType[]>();
   const { signOutUser } = useAuth();
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
     //Update the input field, get the current authenticated user info
     handleChange("fullname", auth.currentUser?.displayName as string);
     handleChange("email", auth.currentUser?.email as string);
-  }, []);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      const fetchDataFromCloud = async () => {
+        const dataArr = await retrieveDataFromDB();
+        setListings(dataArr as unknown as DataFromDBType[]);
+        setLoading(false);
+      };
+      fetchDataFromCloud();
+    }
+    return () => {};
+  }, [listings]);
 
   const handleChangeName = (event: ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -103,19 +119,39 @@ export default function Profile(): JSX.Element {
                 </p>
               </div>
             </form>
-            <button
-              className="flex justify-center items-center w-full mt-10 p-3 text-white bg-blue-600
+            <Link to={"/create-listing"}>
+              <button
+                className="flex justify-center items-center w-full mt-10 p-3 text-white bg-blue-600
               rounded text-lg transition delay-100 ease-in-out hover:bg-blue-900 hover:shadow-lg 
                  active:bg-blue-800 uppercase"
-              type="submit"
-            >
-              <FcHome className="text-3xl bg-red-200 rounded-full" />
-              <span className="ml-3">Sell or rent your home</span>
-            </button>
+                type="submit"
+              >
+                <FcHome className="text-3xl bg-red-200 rounded-full" />
+                <span className="ml-3">Sell or rent your home</span>
+              </button>
+            </Link>
           </div>
         </div>
       </section>
-      <div></div>
+      <div className="max-w-6xl px-3 mt-6 mx-auto">
+        {loading && <h1 className="text-center mt-20 text-2xl">Loading...</h1>}
+        {!loading && listings && (
+          <>
+            <h2 className="text-center mt-20 text-3xl font-semibold">
+              My Listings
+            </h2>
+            <ul>
+              {listings.map((listing) => (
+                <ListingItems
+                  key={listing.listingDocId}
+                  listing={listing}
+                  id={listing.listingDocId}
+                />
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
     </>
   );
 }

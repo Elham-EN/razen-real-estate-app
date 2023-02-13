@@ -32,7 +32,8 @@ export default function SignIn(): JSX.Element {
           <form onSubmit={handleSignInSubmit} className="flex flex-col gap-5">
             <div>
               <input
-                className="w-full px-4 py-2 text-xl placeholder-gray-400 border-gray-300 rounded transition ease-in-out"
+                className="w-full px-4 py-2 text-xl placeholder-gray-400 border-gray-300 
+                  rounded transition ease-in-out"
                 type="email"
                 id="email"
                 value={formData.email}
@@ -44,7 +45,8 @@ export default function SignIn(): JSX.Element {
             </div>
             <div className="relative">
               <input
-                className="w-full px-4 py-2 text-xl placeholder-gray-400 border-gray-300 rounded transition ease-in-out"
+                className="w-full px-4 py-2 text-xl placeholder-gray-400 border-gray-300 
+                  rounded transition ease-in-out"
                 type={showPassword ? "text" : "password"}
                 id="password"
                 value={formData.password}
@@ -69,7 +71,8 @@ export default function SignIn(): JSX.Element {
               <p>
                 Don't have account?
                 <Link
-                  className="text-red-600 transition duration-200 ease-in-out hover:text-red-800 ml-1"
+                  className="text-red-600 transition duration-200 ease-in-out 
+                    hover:text-red-800 ml-1"
                   to="/sign-up"
                 >
                   Register
@@ -77,7 +80,8 @@ export default function SignIn(): JSX.Element {
               </p>
               <p>
                 <Link
-                  className="text-blue-600 transition duration-1000 ease-in-out hover:text-blue-700"
+                  className="text-blue-600 transition duration-1000 ease-in-out 
+                    hover:text-blue-700"
                   to="/forgot-password"
                 >
                   Forgot password?
@@ -86,7 +90,9 @@ export default function SignIn(): JSX.Element {
             </div>
             {!isPending && (
               <button
-                className="bg-blue-600 w-full text-white py-3 rounded transition duration-300 ease-in-out hover:bg-blue-800 font-medium uppercase shadow-md hover:shadow-lg active:bg-blue-800"
+                className="bg-blue-600 w-full text-white py-3 rounded transition 
+                  duration-300 ease-in-out hover:bg-blue-800 font-medium uppercase 
+                  shadow-md hover:shadow-lg active:bg-blue-800"
                 type="submit"
               >
                 Sign in
@@ -94,13 +100,18 @@ export default function SignIn(): JSX.Element {
             )}
             {isPending && (
               <button
-                className="bg-blue-600 w-full text-white py-3 rounded transition duration-300 ease-in-out hover:bg-blue-800 font-medium uppercase shadow-md hover:shadow-lg active:bg-blue-800"
+                className="bg-blue-600 w-full text-white py-3 rounded transition 
+                  duration-300 ease-in-out hover:bg-blue-800 font-medium uppercase 
+                  shadow-md hover:shadow-lg active:bg-blue-800"
                 type="submit"
               >
                 Loading
               </button>
             )}
-            <div className="flex items-center before:border-t before:flex-1 before:border-gray-300 after:border-t after:flex-1 after:border-gray-300">
+            <div
+              className="flex items-center before:border-t before:flex-1 
+              before:border-gray-300 after:border-t after:flex-1 after:border-gray-300"
+            >
               <p className="text-center font-semibold mx-4">OR</p>
             </div>
             <OAuthBtn />

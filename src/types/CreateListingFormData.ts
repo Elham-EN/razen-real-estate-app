@@ -55,3 +55,23 @@ export interface saveFormDataToDB {
   geolocation: GeolocationType;
   imageURLs: string[];
 }
+
+export interface DataFromDBType {
+  type?: string;
+  name?: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  parking?: boolean;
+  furnished?: boolean;
+  address?: string;
+  description?: string;
+  offer?: boolean;
+  regularPrice?: number;
+  discountedPrice?: number;
+  images?: FileList | null;
+  geolocation?: GeolocationType;
+  imageURLs?: string[];
+  userRef?: string;
+  timestamp?: FieldValue;
+  listingDocId?: string;
+}
