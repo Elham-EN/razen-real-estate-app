@@ -21,15 +21,19 @@ import {
   DataFromDBType,
 } from "../types/CreateListingFormData";
 import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 export default function useCloudService() {
   let dataSet = new Set<DataFromDBType>();
   const [dataArr, setDataArr] = useState(Array());
   const storeImageToBucket = async (image: File) => {
     // A reference can be thought of as a pointer to a file in the cloud
-    const filename = `${auth.currentUser?.uid}-${image.name}}`;
+    const filename = `${auth.currentUser?.uid}-${image.name}-${uuidv4()}}`;
     // Create a storage reference from our storage service
-    const storageRef = ref(firebaseStorage, `images/${filename}`);
+    const storageRef = ref(
+      firebaseStorage,
+      `images/${auth.currentUser?.uid}/${filename}`
+    );
     try {
       // Upload image to the cloud storage
       const result = await uploadBytes(storageRef, image);
@@ -77,7 +81,8 @@ export default function useCloudService() {
       // current authenticated user
       const q = query(
         collection(firestoreDB, "listings"),
-        where("userRef", "==", auth.currentUser?.uid)
+        where("userRef", "==", auth.currentUser?.uid),
+        orderBy("timestamp", "desc")
       );
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {

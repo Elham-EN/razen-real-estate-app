@@ -1,4 +1,4 @@
-import { FieldValue } from "firebase/firestore";
+import { FieldValue, Timestamp } from "firebase/firestore";
 
 export interface FormDataType {
   type: string;
@@ -72,6 +72,6 @@ export interface DataFromDBType {
   geolocation?: GeolocationType;
   imageURLs?: string[];
   userRef?: string;
-  timestamp?: FieldValue;
+  timestamp?: Timestamp;
   listingDocId?: string;
 }

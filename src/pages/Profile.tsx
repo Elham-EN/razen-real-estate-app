@@ -140,8 +140,11 @@ export default function Profile(): JSX.Element {
             <h2 className="text-center mt-20 text-3xl font-semibold">
               My Listings
             </h2>
-            <ul>
-              {listings.map((listing) => (
+            <ul
+              className="sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 
+              mt-6 mb-6"
+            >
+              {listings.map((listing, index) => (
                 <ListingItems
                   key={listing.listingDocId}
                   listing={listing}
